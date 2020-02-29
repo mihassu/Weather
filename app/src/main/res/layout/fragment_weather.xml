@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/city_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/button_select_city"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/select_city"/>
+
+    <TextView
+        android:id="@+id/city_name_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/big_text"
+        tools:text="Санкт-Петербург" />
+
+    <TextView
+        android:id="@+id/temperature_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/middle_text"
+        tools:text="+16C" />
+
+    <TextView
+        android:id="@+id/forecast_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/middle_text"
+        tools:text="Облачно с прояснениями" />
+
+</LinearLayout>
