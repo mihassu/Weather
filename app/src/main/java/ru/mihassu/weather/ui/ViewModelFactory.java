@@ -5,21 +5,27 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import ru.mihassu.weather.data.repository.WeatherRepository;
+import ru.mihassu.weather.ui.cities.CitiesViewModel;
 
-public class MainViewModelFactory extends ViewModelProvider.NewInstanceFactory {
+public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
     private WeatherRepository repository;
 
-    public MainViewModelFactory(WeatherRepository repository) {
+    public ViewModelFactory(WeatherRepository repository) {
         this.repository = repository;
     }
 
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+        if (modelClass == CitiesViewModel.class) {
+            return (T) new CitiesViewModel(repository);
+        }
+
         if (modelClass == MainViewModel.class) {
             return (T) new MainViewModel(repository);
         }
+
         return null;
     }
 }

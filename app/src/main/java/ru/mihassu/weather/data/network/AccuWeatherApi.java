@@ -1,6 +1,7 @@
 package ru.mihassu.weather.data.network;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Single;
 import retrofit2.http.GET;
@@ -18,8 +19,10 @@ public interface AccuWeatherApi {
             @Query("language") String language
     );
 
-    @GET("currentconditions/v1/")
-    Single<Conditions> getWeather(
+
+
+    @GET("currentconditions/v1/{locationKey}")
+    Single<List<Conditions>> getWeather(
             @Path("locationKey") String locationKey,
             @Query("apikey")String apiKey,
             @Query("language") String language

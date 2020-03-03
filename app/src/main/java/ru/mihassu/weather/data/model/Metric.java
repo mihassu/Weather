@@ -9,7 +9,15 @@ public class Metric {
     @Expose
     private double value;
 
+    @SerializedName("Unit")
+    @Expose
+    private String unit;
+
     public double getValue() {
         return value;
+    }
+
+    public String getUnit() {
+        return unit;
     }
 }

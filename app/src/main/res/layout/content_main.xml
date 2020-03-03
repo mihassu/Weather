@@ -17,38 +17,41 @@
 
 <!--        />-->
 
-
-    <EditText
-        android:id="@+id/city"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/button"/>
-
     <Button
-        android:id="@+id/button"
+        android:id="@+id/button_select_city"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/select_city"
-        app:layout_constraintTop_toBottomOf="@id/city"
-        app:layout_constraintBottom_toTopOf="@id/progressBar"/>
+        android:text="@string/select_city"/>
+
+    <TextView
+        android:id="@+id/city_name_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/big_text"
+        tools:text="Санкт-Петербург" />
+
+    <TextView
+        android:id="@+id/temperature_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/middle_text"
+        tools:text="+16C" />
+
+    <TextView
+        android:id="@+id/weather_text_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/middle_text"
+        tools:text="Облачно с прояснениями" />
 
     <ProgressBar
-        android:id="@+id/progressBar"
+        android:id="@+id/progressBar_weather"
         style="?android:attr/progressBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/button"
-        app:layout_constraintBottom_toTopOf="@id/rv_cities"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_cities"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:listitem="@layout/city_item"
-        tools:itemCount="4"/>
+        android:visibility="gone"/>
 
 </LinearLayout>

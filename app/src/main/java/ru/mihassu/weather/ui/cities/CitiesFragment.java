@@ -34,7 +34,7 @@ public class CitiesFragment extends Controller {
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
 
         View view = inflater.inflate(R.layout.fragment_cities, container,false);
-        cityField = view.findViewById(R.id.city_field);
+//        cityField = view.findViewById(R.id.city_field);
 
         return view;
     }

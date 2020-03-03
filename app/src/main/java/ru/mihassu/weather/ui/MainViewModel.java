@@ -1,18 +1,20 @@
 package ru.mihassu.weather.ui;
 
-import androidx.lifecycle.LiveData;
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
-
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import ru.mihassu.weather.data.repository.WeatherRepository;
 import ru.mihassu.weather.domain.model.City;
 
 public class MainViewModel extends ViewModel {
 
-    private MutableLiveData<ArrayList<City>> searchData = new MutableLiveData<>();
+    private MutableLiveData<City> cityData = new MutableLiveData<>();
+    private MutableLiveData<City> weatherData = new MutableLiveData<>();
     private WeatherRepository repository;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -20,16 +22,27 @@ public class MainViewModel extends ViewModel {
         this.repository = repository;
     }
 
-    public void search(String apiKey, String searchText, String language) {
-        compositeDisposable.add(
-                repository
-                        .search(apiKey, searchText, language)
-                        .subscribe(data -> searchData.setValue(data), System.out::println)
-        );
+
+    public MutableLiveData<City> getCityData() {
+        return cityData;
     }
 
-    public MutableLiveData<ArrayList<City>> getSearchData() {
-        return searchData;
+    public MutableLiveData<City> getWeatherData() {
+        return weatherData;
+    }
+
+    public void getCityFromDb(String locationKey) {
+        cityData.setValue(repository.getCityFromDbByKey(locationKey));
+    }
+
+    public void loadWeather(String locationKey, String apiKey, String language) {
+        Log.d("Weather", "MainViewModel - loadWeather()");
+        compositeDisposable.add(repository
+                .loadWeather(locationKey, apiKey, language)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(data -> cityData.setValue(data), throwable -> Log.d("Weather", "Error loadWeather"))
+        );
     }
 
     @Override

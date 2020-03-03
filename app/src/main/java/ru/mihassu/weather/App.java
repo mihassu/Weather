@@ -17,7 +17,7 @@ public class App extends Application {
         Realm.init(this);
 
         RealmConfiguration config = new RealmConfiguration.Builder()
-                .name("cities.realm")
+                .name("mycities.realm")
                 .build();
         Realm.setDefaultConfiguration(config);
     }

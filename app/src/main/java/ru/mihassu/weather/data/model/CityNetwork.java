@@ -19,6 +19,10 @@ public class CityNetwork {
     @Expose
     private Country country;
 
+    @SerializedName("AdministrativeArea")
+    @Expose
+    private AdministrativeArea administrativeArea;
+
 
 
     public String getLocationKey() {
@@ -49,11 +53,24 @@ public class CityNetwork {
         return country.getCountryName();
     }
 
+    public AdministrativeArea getAdministrativeArea() {
+        return administrativeArea;
+    }
+
+    public void setAdministrativeArea(AdministrativeArea administrativeArea) {
+        this.administrativeArea = administrativeArea;
+    }
+
     public static City convertToCityModel (CityNetwork networkModel) {
         return new City(
                 networkModel.getLocationKey(),
                 networkModel.getCityName(),
-                networkModel.getCountryName()
+                networkModel.getCountryName(),
+                networkModel.getAdministrativeArea().getLocalizedName(),
+                networkModel.getAdministrativeArea().getLocalizedType(),
+                "",
+                0,
+                ""
         );
     }
 }
