@@ -18,17 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.List;
-
 import ru.mihassu.weather.App;
 import ru.mihassu.weather.R;
-import ru.mihassu.weather.data.db.DbProvider;
-import ru.mihassu.weather.data.db.RealmProvider;
 import ru.mihassu.weather.data.di.DataComponent;
-import ru.mihassu.weather.data.model.CityRealm;
-import ru.mihassu.weather.data.network.AccuWeatherApi;
-import ru.mihassu.weather.data.network.RetrofitInit;
-import ru.mihassu.weather.data.repository.WeatherRepository;
 import ru.mihassu.weather.domain.model.City;
 import ru.mihassu.weather.ui.FragmentEventListener;
 import ru.mihassu.weather.ui.ViewModelFactory;
@@ -97,9 +89,6 @@ public class SearchFragment extends Fragment {
 
     private void initViewModel() {
         DataComponent dataComponent = ((App) getActivity().getApplication()).getDataComponent();
-//        AccuWeatherApi api = RetrofitInit.newApiInstance();
-//        DbProvider<CityRealm, List<City>> realmProvider = new RealmProvider();
-//        WeatherRepository repository = new WeatherRepository(api, realmProvider);
         viewModel = new ViewModelProvider(this,
                 new ViewModelFactory(dataComponent.getRepository()))
                 .get(SearchFragmentViewModel.class);
