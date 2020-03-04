@@ -9,14 +9,14 @@ import io.reactivex.disposables.CompositeDisposable;
 import ru.mihassu.weather.data.repository.WeatherRepository;
 import ru.mihassu.weather.domain.model.City;
 
-public class WeatherFragmentViewModel extends ViewModel {
+public class WeatherViewModel extends ViewModel {
 
     private MutableLiveData<City> cityData = new MutableLiveData<>();
     private MutableLiveData<City> weatherData = new MutableLiveData<>();
     private WeatherRepository repository;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public WeatherFragmentViewModel(WeatherRepository repository) {
+    public WeatherViewModel(WeatherRepository repository) {
         this.repository = repository;
     }
 

@@ -38,20 +38,20 @@ import static ru.mihassu.weather.ui.MainActivity.KEY_EXTRA;
 public class WeatherFragment extends Fragment {
 
     private Button buttonSelectCity;
-    private TextView cityNameField;
-    private TextView temperatureField;
-    private TextView weatherTextField;
-    private ProgressBar progressBar;
-    private WeatherFragmentViewModel viewModel;
+//    private TextView cityNameField;
+//    private TextView temperatureField;
+//    private TextView weatherTextField;
+//    private ProgressBar progressBar;
+//    private WeatherViewModel viewModel;
     private FragmentEventListener activity;
 
-    public static WeatherFragment newInstance(String locationKey) {
-        WeatherFragment fragment = new WeatherFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString(KEY_EXTRA, locationKey);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
+//    public static WeatherFragment newInstance(String locationKey) {
+//        WeatherFragment fragment = new WeatherFragment();
+//        Bundle bundle = new Bundle();
+//        bundle.putString(KEY_EXTRA, locationKey);
+//        fragment.setArguments(bundle);
+//        return fragment;
+//    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -66,29 +66,29 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initViewModel();
+//        initViewModel();
 
-        //Подписаться на LiveData - получить город из базы
-        viewModel.getCityData().observe(this, data -> {
-            if (data != null) {
-                //Установить в поле название города
-                cityNameField.setText(data.getCityName());
-                //Загрузить погоду
-//                viewModel.loadWeather(data.getLocationKey(), API_KEY, LANGUAGE);
-                viewModel.getWeatherFromDb(data.getLocationKey());
-                Log.d("Weather", "MainActivity - loadWeather() " + "key: " + data.getLocationKey());
-                progressBar.setVisibility(View.VISIBLE);
-            }
-        });
-
-        //Подписаться на LiveData - получить погоду
-        viewModel.getWeatherData().observe(this, data -> {
-            Log.d("Weather", "MainActivity - gotWeather");
-
-            weatherTextField.setText(data.getWeatherText());
-            temperatureField.setText(String.valueOf(data.getTemperatureValue()));
-            progressBar.setVisibility(View.GONE);
-        });
+//        //Подписаться на LiveData - получить город из базы
+//        viewModel.getCityData().observe(this, data -> {
+//            if (data != null) {
+//                //Установить в поле название города
+//                cityNameField.setText(data.getCityName());
+//                //Загрузить погоду
+////                viewModel.loadWeather(data.getLocationKey(), API_KEY, LANGUAGE);
+//                viewModel.getWeatherFromDb(data.getLocationKey());
+//                Log.d("Weather", "MainActivity - loadWeather() " + "key: " + data.getLocationKey());
+//                progressBar.setVisibility(View.VISIBLE);
+//            }
+//        });
+//
+//        //Подписаться на LiveData - получить погоду
+//        viewModel.getWeatherData().observe(this, data -> {
+//            Log.d("Weather", "MainActivity - gotWeather");
+//
+//            weatherTextField.setText(data.getWeatherText());
+//            temperatureField.setText(String.valueOf(data.getTemperatureValue()));
+//            progressBar.setVisibility(View.GONE);
+//        });
     }
 
     @Nullable
@@ -97,32 +97,32 @@ public class WeatherFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_weather, container, false);
         initViews(view);
 
-        //Получить город из базы по ключу
-        String locationKey = getArguments().getString(KEY_EXTRA, null);
-        if (locationKey != null) {
-            viewModel.getCityFromDb(locationKey);
-        }
+//        //Получить город из базы по ключу
+//        String locationKey = getArguments().getString(KEY_EXTRA, null);
+//        if (locationKey != null) {
+//            viewModel.getCityFromDb(locationKey);
+//        }
 
         return view;
     }
 
     private void initViews(View view) {
         buttonSelectCity = view.findViewById(R.id.button_select_city);
-        cityNameField = view.findViewById(R.id.city_name_field);
-        temperatureField = view.findViewById(R.id.temperature_field);
-        weatherTextField = view.findViewById(R.id.weather_text_field);
-        progressBar = view.findViewById(R.id.progressBar_weather);
+//        cityNameField = view.findViewById(R.id.city_name_field);
+//        temperatureField = view.findViewById(R.id.temperature_field);
+//        weatherTextField = view.findViewById(R.id.weather_text_field);
+//        progressBar = view.findViewById(R.id.progressBar_weather);
 
         buttonSelectCity.setOnClickListener(v -> activity.showSearchFragment());
     }
 
-    private void initViewModel() {
-        DataComponent dataComponent = ((App) getActivity().getApplication()).getDataComponent();
-//        AccuWeatherApi api = RetrofitInit.newApiInstance();
-//        DbProvider<CityRealm, List<City>> realmProvider = new RealmProvider();
-//        WeatherRepository repository = new WeatherRepository(api, realmProvider);
-        viewModel = new ViewModelProvider(this,
-                new ViewModelFactory(dataComponent.getRepository()))
-                .get(WeatherFragmentViewModel.class);
-    }
+//    private void initViewModel() {
+//        DataComponent dataComponent = ((App) getActivity().getApplication()).getDataComponent();
+////        AccuWeatherApi api = RetrofitInit.newApiInstance();
+////        DbProvider<CityRealm, List<City>> realmProvider = new RealmProvider();
+////        WeatherRepository repository = new WeatherRepository(api, realmProvider);
+//        viewModel = new ViewModelProvider(this,
+//                new ViewModelFactory(dataComponent.getRepository()))
+//                .get(WeatherViewModel.class);
+//    }
 }
