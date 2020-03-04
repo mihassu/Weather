@@ -74,7 +74,8 @@ public class WeatherFragment extends Fragment {
                 //Установить в поле название города
                 cityNameField.setText(data.getCityName());
                 //Загрузить погоду
-                viewModel.loadWeather(data.getLocationKey(), API_KEY, LANGUAGE);
+//                viewModel.loadWeather(data.getLocationKey(), API_KEY, LANGUAGE);
+                viewModel.getWeatherFromDb(data.getLocationKey());
                 Log.d("Weather", "MainActivity - loadWeather() " + "key: " + data.getLocationKey());
                 progressBar.setVisibility(View.VISIBLE);
             }

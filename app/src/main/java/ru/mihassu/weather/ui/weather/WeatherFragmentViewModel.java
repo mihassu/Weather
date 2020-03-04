@@ -42,6 +42,10 @@ public class WeatherFragmentViewModel extends ViewModel {
         );
     }
 
+    public void getWeatherFromDb(String locationKey) {
+        weatherData.setValue(repository.getCityFromDbByKey(locationKey));
+    }
+
     @Override
     protected void onCleared() {
         compositeDisposable.clear();

@@ -80,6 +80,8 @@ public class WeatherRepository implements IWeatherRepository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+
+
     public void addToDb(City city) {
         realmProvider.insert(new CityRealm(
                 city.getLocationKey(),
