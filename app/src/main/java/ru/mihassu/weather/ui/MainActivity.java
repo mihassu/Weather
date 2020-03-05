@@ -1,59 +1,52 @@
 package ru.mihassu.weather.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.List;
-
+import ru.mihassu.weather.App;
 import ru.mihassu.weather.R;
-import ru.mihassu.weather.data.db.DbProvider;
-import ru.mihassu.weather.data.db.RealmProvider;
-import ru.mihassu.weather.data.model.CityRealm;
-import ru.mihassu.weather.data.network.AccuWeatherApi;
-import ru.mihassu.weather.data.network.RetrofitInit;
-import ru.mihassu.weather.data.repository.WeatherRepository;
+import ru.mihassu.weather.data.di.DataComponent;
 import ru.mihassu.weather.domain.model.City;
-import ru.mihassu.weather.ui.cities.CitiesActivity;
+import ru.mihassu.weather.ui.cities.SearchFragment;
+import ru.mihassu.weather.ui.weather.WeatherViewModel;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FragmentEventListener{
 
     public static final String API_KEY = "tOH3m9brk17Accoh8FAXbglaqkqK1jLd";
     public static final String LANGUAGE = "ru-ru";
     public static final String KEY_EXTRA = "key";
-    public static final int REQUEST_CODE = 1;
-    private final String TAG = "MainActivity";
+    private final String LOG_TAG = "Weather";
+    private final String SEARCH_FRAGMENT = "SearchFragment";
 
-    private MainViewModel viewModel;
+    private FragmentManager fragmentManager;
+    private WeatherViewModel viewModel;
 
     private String currentKey;
-    private Button buttonSelectCity;
     private TextView cityNameField;
     private TextView temperatureField;
     private TextView weatherTextField;
     private ProgressBar progressBar;
-//    private Router router;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        initRouter(savedInstanceState);
         initToolbar();
         initFab();
         initViewModel();
@@ -63,57 +56,76 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getCityData().observe(this, data -> {
             if (data != null) {
                 //Установить в поле название города
+                changeProgress();
                 cityNameField.setText(data.getCityName());
-                //Загрузить погоду
-                viewModel.loadWeather(data.getLocationKey(), API_KEY, LANGUAGE);
-                Log.d("Weather", "MainActivity - loadWeather() " + "key: " + data.getLocationKey());
-                progressBar.setVisibility(View.VISIBLE);
+                weatherTextField.setText(data.getWeatherText());
+                temperatureField.setText(String.valueOf(data.getTemperatureValue()));
+                Log.d(LOG_TAG, "Got city - setText(): " + data.getCityName());
             }
         });
 
         //Подписаться на LiveData - получить погоду
         viewModel.getWeatherData().observe(this, data -> {
-            Log.d("Weather", "MainActivity - gotWeather");
-
+            Log.d(LOG_TAG, "MainActivity - gotWeather + " + data.getTemperatureValue());
+            changeProgress();
+            cityNameField.setText(data.getCityName());
             weatherTextField.setText(data.getWeatherText());
             temperatureField.setText(String.valueOf(data.getTemperatureValue()));
-            progressBar.setVisibility(View.GONE);
         });
     }
 
     private void initViews() {
-        buttonSelectCity = findViewById(R.id.button_select_city);
-        cityNameField = findViewById(R.id.city_name_field);
-        temperatureField = findViewById(R.id.temperature_field);
-        weatherTextField = findViewById(R.id.weather_text_field);
-        progressBar = findViewById(R.id.progressBar_weather);
-
-        //Запустить активити с быбором городов
-        buttonSelectCity.setOnClickListener(v -> {
-            Intent intent = new Intent(this, CitiesActivity.class);
-            startActivityForResult(intent, REQUEST_CODE);
-        });
+        fragmentManager = getSupportFragmentManager();
+        cityNameField = getFragmentWeather().getView().findViewById(R.id.city_name_field);
+        weatherTextField = getFragmentWeather().getView().findViewById(R.id.weather_text_field);
+        temperatureField = getFragmentWeather().getView().findViewById(R.id.temperature_field);
+        progressBar = getFragmentWeather().getView().findViewById(R.id.progressBar_weather);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            if (data != null) {
-                //После того как получен ключ города - найти его в базе
-                currentKey = data.getStringExtra(KEY_EXTRA);
-                viewModel.getCityFromDb(currentKey);
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
+    public void showWeatherFragment(City city) {
+        Log.d(LOG_TAG, "Got locationKey: " + city.getLocationKey() + " - loadWeather()");
+        currentKey = city.getLocationKey();
+//        viewModel.getWeatherFromDb(city.getLocationKey());
+        viewModel.loadWeather(city.getLocationKey(), API_KEY, LANGUAGE);
+        changeProgress();
+        removeSearchFragment();
+    }
+
+    @Override
+    public void showSearchFragment() {
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        ft.replace(R.id.container_main, new SearchFragment(), SEARCH_FRAGMENT);
+        ft.commit();
+    }
+
+    private void removeSearchFragment() {
+        if (fragmentManager.findFragmentByTag(SEARCH_FRAGMENT) != null) {
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+            ft.remove(fragmentManager.findFragmentByTag(SEARCH_FRAGMENT));
+            ft.commit();
         }
     }
 
     private void initViewModel() {
-        AccuWeatherApi api = RetrofitInit.newApiInstance();
-        DbProvider<CityRealm, List<City>> realmProvider = new RealmProvider();
-        WeatherRepository repository = new WeatherRepository(api, realmProvider);
-        viewModel = new ViewModelProvider(this, new ViewModelFactory(repository))
-                .get(MainViewModel.class);
+        DataComponent dataComponent = ((App) getApplication()).getDataComponent();
+        viewModel = new ViewModelProvider(this,
+                new ViewModelFactory(dataComponent.getRepository()))
+                .get(WeatherViewModel.class);
+    }
+
+    private Fragment getFragmentWeather() {
+        return fragmentManager.findFragmentById(R.id.fragment_weather_static);
+    }
+
+    private void changeProgress() {
+        if (progressBar.getVisibility() == View.VISIBLE) {
+            progressBar.setVisibility(View.GONE);
+        } else {
+            progressBar.setVisibility(View.VISIBLE);
+        }
     }
 
     private void initFab() {
@@ -136,9 +148,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-//        if (!router.handleBack()) {
-//            super.onBackPressed();
-//        }
     }
 
     @Override
@@ -157,16 +166,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case android.R.id.home :
-//                router.handleBack();
+                removeSearchFragment();
         }
         return super.onOptionsItemSelected(item);
     }
 
-//    private void initRouter(Bundle savedInstanceState) {
-//        ViewGroup container = findViewById(R.id.container_main);
-//        router = Conductor.attachRouter(this, container, savedInstanceState);
-//        if (!router.hasRootController()) {
-//            router.setRoot(RouterTransaction.with(new WeatherFragmentC()));
-//        }
-//    }
 }

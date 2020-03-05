@@ -1,25 +1,23 @@
 package ru.mihassu.weather.ui.cities;
 
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.disposables.CompositeDisposable;
 import ru.mihassu.weather.data.repository.WeatherRepository;
 import ru.mihassu.weather.domain.model.City;
 
-public class CitiesViewModel extends ViewModel implements LifecycleObserver {
+public class SearchFragmentViewModel extends ViewModel {
 
     private MutableLiveData<List<City>> searchData = new MutableLiveData<>();
     private WeatherRepository repository;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public CitiesViewModel(WeatherRepository repository) {
+    public SearchFragmentViewModel(WeatherRepository repository) {
         this.repository = repository;
     }
 
@@ -51,8 +49,8 @@ public class CitiesViewModel extends ViewModel implements LifecycleObserver {
         super.onCleared();
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    public void onStart() {
-        loadCitiesFromDb();
-    }
+//    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+//    public void onStart() {
+//        loadCitiesFromDb();
+//    }
 }

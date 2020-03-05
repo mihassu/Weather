@@ -5,7 +5,8 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import ru.mihassu.weather.data.repository.WeatherRepository;
-import ru.mihassu.weather.ui.cities.CitiesViewModel;
+import ru.mihassu.weather.ui.cities.SearchFragmentViewModel;
+import ru.mihassu.weather.ui.weather.WeatherViewModel;
 
 public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
@@ -18,12 +19,13 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass == CitiesViewModel.class) {
-            return (T) new CitiesViewModel(repository);
+
+        if (modelClass == WeatherViewModel.class) {
+            return (T) new WeatherViewModel(repository);
         }
 
-        if (modelClass == MainViewModel.class) {
-            return (T) new MainViewModel(repository);
+        if (modelClass == SearchFragmentViewModel.class) {
+            return (T) new SearchFragmentViewModel(repository);
         }
 
         return null;

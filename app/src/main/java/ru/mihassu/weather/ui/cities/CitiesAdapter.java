@@ -77,6 +77,5 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.CitiesView
     interface OnCityClickListener {
 //        void onClick(String locationKey);
         void onClick(City city);
-
     }
 }
