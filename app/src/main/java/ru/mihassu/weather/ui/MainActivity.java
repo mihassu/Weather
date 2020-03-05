@@ -22,6 +22,7 @@ import android.widget.TextView;
 import ru.mihassu.weather.App;
 import ru.mihassu.weather.R;
 import ru.mihassu.weather.data.di.DataComponent;
+import ru.mihassu.weather.domain.model.City;
 import ru.mihassu.weather.ui.cities.SearchFragment;
 import ru.mihassu.weather.ui.weather.WeatherViewModel;
 
@@ -55,44 +56,39 @@ public class MainActivity extends AppCompatActivity implements FragmentEventList
         viewModel.getCityData().observe(this, data -> {
             if (data != null) {
                 //Установить в поле название города
+                changeProgress();
                 cityNameField.setText(data.getCityName());
+                weatherTextField.setText(data.getWeatherText());
+                temperatureField.setText(String.valueOf(data.getTemperatureValue()));
                 Log.d(LOG_TAG, "Got city - setText(): " + data.getCityName());
-                //Загрузить погоду
-//                viewModel.loadWeather(data.getLocationKey(), API_KEY, LANGUAGE);
-                viewModel.getWeatherFromDb(data.getLocationKey());
-                Log.d(LOG_TAG, "loadWeather() " + "key: " + data.getLocationKey());
-                progressBar.setVisibility(View.VISIBLE);
             }
         });
 
         //Подписаться на LiveData - получить погоду
         viewModel.getWeatherData().observe(this, data -> {
             Log.d(LOG_TAG, "MainActivity - gotWeather + " + data.getTemperatureValue());
+            changeProgress();
             cityNameField.setText(data.getCityName());
             weatherTextField.setText(data.getWeatherText());
             temperatureField.setText(String.valueOf(data.getTemperatureValue()));
-            progressBar.setVisibility(View.GONE);
         });
-
-        //Получить город из базы
-        if (savedInstanceState != null) {
-            viewModel.getCityFromDb(savedInstanceState.getString(KEY_EXTRA));
-            Log.d(LOG_TAG, "savedInstanceState != null - getCityFromDb()");
-        }
     }
 
     private void initViews() {
         fragmentManager = getSupportFragmentManager();
-        cityNameField = getFragmetnWeather().getView().findViewById(R.id.city_name_field);
-        weatherTextField = getFragmetnWeather().getView().findViewById(R.id.weather_text_field);
-        temperatureField = getFragmetnWeather().getView().findViewById(R.id.temperature_field);
-        progressBar = getFragmetnWeather().getView().findViewById(R.id.progressBar_weather);
+        cityNameField = getFragmentWeather().getView().findViewById(R.id.city_name_field);
+        weatherTextField = getFragmentWeather().getView().findViewById(R.id.weather_text_field);
+        temperatureField = getFragmentWeather().getView().findViewById(R.id.temperature_field);
+        progressBar = getFragmentWeather().getView().findViewById(R.id.progressBar_weather);
     }
 
     @Override
-    public void showWeatherFragment(String locationKey) {
-        Log.d(LOG_TAG, "Got locationKey - getWeatherFromDb()");
-        viewModel.getWeatherFromDb(locationKey);
+    public void showWeatherFragment(City city) {
+        Log.d(LOG_TAG, "Got locationKey: " + city.getLocationKey() + " - loadWeather()");
+        currentKey = city.getLocationKey();
+//        viewModel.getWeatherFromDb(city.getLocationKey());
+        viewModel.loadWeather(city.getLocationKey(), API_KEY, LANGUAGE);
+        changeProgress();
         removeSearchFragment();
     }
 
@@ -115,16 +111,21 @@ public class MainActivity extends AppCompatActivity implements FragmentEventList
 
     private void initViewModel() {
         DataComponent dataComponent = ((App) getApplication()).getDataComponent();
-//        AccuWeatherApi api = RetrofitInit.newApiInstance();
-//        DbProvider<CityRealm, List<City>> realmProvider = new RealmProvider();
-//        WeatherRepository repository = new WeatherRepository(api, realmProvider);
         viewModel = new ViewModelProvider(this,
                 new ViewModelFactory(dataComponent.getRepository()))
                 .get(WeatherViewModel.class);
     }
 
-    private Fragment getFragmetnWeather() {
+    private Fragment getFragmentWeather() {
         return fragmentManager.findFragmentById(R.id.fragment_weather_static);
+    }
+
+    private void changeProgress() {
+        if (progressBar.getVisibility() == View.VISIBLE) {
+            progressBar.setVisibility(View.GONE);
+        } else {
+            progressBar.setVisibility(View.VISIBLE);
+        }
     }
 
     private void initFab() {

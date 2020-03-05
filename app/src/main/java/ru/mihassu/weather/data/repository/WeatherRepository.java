@@ -65,15 +65,14 @@ public class WeatherRepository implements IWeatherRepository {
         return api.getWeather(locationKey, apiKey, language)
                 .map(conditionsList -> {
                     Conditions conditions = conditionsList.get(0);
-                    Log.d("Weather", "WeatherRepository - 1.locationKey: " + locationKey);
-//                    Log.d("Weather", "WeatherRepository - " + conditions.getWeatherText() + ", " + conditions.getTemperature().getMetric().getValue());
+                    Log.d("Weather", "WeatherRepository - " + conditions.getWeatherText() + ", " + conditions.getTemperature().getMetric().getValue());
                     CityRealm updatedCity = CityRealm.convertToRealmModel(getCityFromDbByKey(locationKey));
                     Log.d("Weather", "WeatherRepository - 2. " + updatedCity.getCityName());
                     updatedCity.setWeatherText(conditions.getWeatherText());
                     updatedCity.setTemperatureValue(conditions.getTemperature().getMetric().getValue());
                     updatedCity.setTemperatureUnit(conditions.getTemperature().getMetric().getUnit());
                     Log.d("Weather", "WeatherRepository - " + updatedCity.getCityName());
-                    realmProvider.update(updatedCity);
+                    realmProvider.insert(updatedCity);
                     return CityRealm.convertToCityModel(updatedCity);
                 })
                 .subscribeOn(Schedulers.io())

@@ -106,6 +106,6 @@ public class SearchFragment extends Fragment {
     private void showWeather(City city) {
         //Добавить в базу
         viewModel.addToDb(city);
-        activity.showWeatherFragment(city.getLocationKey());
+        activity.showWeatherFragment(city);
     }
 }
