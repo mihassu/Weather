@@ -4,13 +4,10 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import ru.mihassu.weather.data.db.DbProvider;
 import ru.mihassu.weather.data.model.CityNetwork;
@@ -38,12 +35,6 @@ public class WeatherRepository implements IWeatherRepository {
                             .stream()
                             .map(cityNetwork -> CityNetwork.convertToCityModel(cityNetwork))
                             .collect(Collectors.toList());
-
-//                    //Добавить в базу
-//                    for (City city: cityList) {
-//                        realmProvider.insert(CityRealm.convertToRealmModel(city));
-//                    }
-
                     return cityList;
                 })
                 .subscribeOn(Schedulers.io())
@@ -78,8 +69,6 @@ public class WeatherRepository implements IWeatherRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
-
 
     public void addToDb(City city) {
         realmProvider.insert(new CityRealm(
