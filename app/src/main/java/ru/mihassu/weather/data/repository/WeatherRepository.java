@@ -59,14 +59,14 @@ public class WeatherRepository implements IWeatherRepository {
                 .orElse(null);
     }
 
-    public Single<City> loadWeather(String locationKey, String apiKey, String language) {
+    public Single<City> loadWeather(City city, String apiKey, String language) {
         Log.d("Weather", "WeatherRepository - loadWeather()");
 
-        return api.getWeather(locationKey, apiKey, language)
+        return api.getWeather(city.getLocationKey(), apiKey, language)
                 .map(conditionsList -> {
                     Conditions conditions = conditionsList.get(0);
                     Log.d("Weather", "WeatherRepository - " + conditions.getWeatherText() + ", " + conditions.getTemperature().getMetric().getValue());
-                    CityRealm updatedCity = CityRealm.convertToRealmModel(getCityFromDbByKey(locationKey));
+                    final CityRealm updatedCity = CityRealm.convertToRealmModel(city);
                     Log.d("Weather", "WeatherRepository - 2. " + updatedCity.getCityName());
                     updatedCity.setWeatherText(conditions.getWeatherText());
                     updatedCity.setTemperatureValue(conditions.getTemperature().getMetric().getValue());
@@ -88,9 +88,10 @@ public class WeatherRepository implements IWeatherRepository {
                 city.getCountryName(),
                 city.getLocalizedName(),
                 city.getLocalizedType(),
-                "",
-                0,
-                ""
+                city.getWeatherText(),
+                city.getTemperatureValue(),
+                city.getTemperatureUnit()
+
         ));
     }
 

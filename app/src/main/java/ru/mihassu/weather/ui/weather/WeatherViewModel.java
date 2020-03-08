@@ -36,16 +36,19 @@ public class WeatherViewModel extends ViewModel {
         weatherData.setValue(repository.getCityFromDbByKey(locationKey));
     }
 
-    public void loadWeather(String locationKey, String apiKey, String language) {
+    public void loadWeather(City city, String apiKey, String language) {
         Log.d("Weather", "MainViewModel - loadWeather()");
         compositeDisposable.add(repository
-                        .loadWeather(locationKey, apiKey, language)
+                        .loadWeather(city, apiKey, language)
 //                .subscribeOn(Schedulers.io())
 //                .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(data -> weatherData.setValue(data), throwable -> Log.d("Weather", "Error loadWeather"))
+                        .subscribe(data -> weatherData.setValue(data), throwable -> Log.d("Weather", "Error loadWeather:" + throwable.getMessage()))
         );
     }
 
+    public void addToDb(City city) {
+        repository.addToDb(city);
+    }
 
 
     @Override

@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements FragmentEventList
             cityNameField.setText(data.getCityName());
             weatherTextField.setText(data.getWeatherText());
             temperatureField.setText(String.valueOf(data.getTemperatureValue()));
+            viewModel.addToDb(data);
         });
     }
 
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements FragmentEventList
         Log.d(LOG_TAG, "Got locationKey: " + city.getLocationKey() + " - loadWeather()");
         currentKey = city.getLocationKey();
 //        viewModel.getWeatherFromDb(city.getLocationKey());
-        viewModel.loadWeather(city.getLocationKey(), API_KEY, LANGUAGE);
+        viewModel.loadWeather(city, API_KEY, LANGUAGE);
         changeProgress();
         removeSearchFragment();
     }
