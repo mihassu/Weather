@@ -4,13 +4,10 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import ru.mihassu.weather.data.db.DbProvider;
 import ru.mihassu.weather.data.model.CityNetwork;
@@ -38,12 +35,6 @@ public class WeatherRepository implements IWeatherRepository {
                             .stream()
                             .map(cityNetwork -> CityNetwork.convertToCityModel(cityNetwork))
                             .collect(Collectors.toList());
-
-//                    //Добавить в базу
-//                    for (City city: cityList) {
-//                        realmProvider.insert(CityRealm.convertToRealmModel(city));
-//                    }
-
                     return cityList;
                 })
                 .subscribeOn(Schedulers.io())
@@ -59,14 +50,14 @@ public class WeatherRepository implements IWeatherRepository {
                 .orElse(null);
     }
 
-    public Single<City> loadWeather(String locationKey, String apiKey, String language) {
+    public Single<City> loadWeather(City city, String apiKey, String language) {
         Log.d("Weather", "WeatherRepository - loadWeather()");
 
-        return api.getWeather(locationKey, apiKey, language)
+        return api.getWeather(city.getLocationKey(), apiKey, language)
                 .map(conditionsList -> {
                     Conditions conditions = conditionsList.get(0);
                     Log.d("Weather", "WeatherRepository - " + conditions.getWeatherText() + ", " + conditions.getTemperature().getMetric().getValue());
-                    CityRealm updatedCity = CityRealm.convertToRealmModel(getCityFromDbByKey(locationKey));
+                    final CityRealm updatedCity = CityRealm.convertToRealmModel(city);
                     Log.d("Weather", "WeatherRepository - 2. " + updatedCity.getCityName());
                     updatedCity.setWeatherText(conditions.getWeatherText());
                     updatedCity.setTemperatureValue(conditions.getTemperature().getMetric().getValue());
@@ -79,8 +70,6 @@ public class WeatherRepository implements IWeatherRepository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-
-
     public void addToDb(City city) {
         realmProvider.insert(new CityRealm(
                 city.getLocationKey(),
@@ -88,9 +77,10 @@ public class WeatherRepository implements IWeatherRepository {
                 city.getCountryName(),
                 city.getLocalizedName(),
                 city.getLocalizedType(),
-                "",
-                0,
-                ""
+                city.getWeatherText(),
+                city.getTemperatureValue(),
+                city.getTemperatureUnit()
+
         ));
     }
 

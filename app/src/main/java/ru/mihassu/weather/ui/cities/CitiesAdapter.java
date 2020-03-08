@@ -52,7 +52,7 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.CitiesView
         private TextView countryName;
         private TextView localizedName;
         private TextView localizedType;
-        private String locationKey;
+//        private String locationKey;
         private City city;
 
         public CitiesViewHolder(@NonNull View itemView) {
@@ -69,7 +69,7 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.CitiesView
             countryName.setText(city.getCountryName());
             localizedName.setText(city.getLocalizedName());
             localizedType.setText(city.getLocalizedType());
-            locationKey = city.getLocationKey();
+//            locationKey = city.getLocationKey();
             this.city = city;
         }
     }

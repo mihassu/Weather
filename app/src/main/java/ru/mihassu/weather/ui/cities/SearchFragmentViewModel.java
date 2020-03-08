@@ -34,12 +34,8 @@ public class SearchFragmentViewModel extends ViewModel {
         );
     }
 
-    public void addToDb(City city) {
-        repository.addToDb(city);
-    }
-
     public void loadCitiesFromDb() {
-        searchData.setValue(repository.loadCitiesFromDb());
+        searchData.postValue(repository.loadCitiesFromDb());
     }
 
 

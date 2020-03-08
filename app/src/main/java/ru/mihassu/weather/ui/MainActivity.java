@@ -1,5 +1,7 @@
 package ru.mihassu.weather.ui;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -33,10 +35,11 @@ public class MainActivity extends AppCompatActivity implements FragmentEventList
     public static final String KEY_EXTRA = "key";
     private final String LOG_TAG = "Weather";
     private final String SEARCH_FRAGMENT = "SearchFragment";
+    public final static String PREF_NAME = "preferences";
 
     private FragmentManager fragmentManager;
     private WeatherViewModel viewModel;
-
+    private SharedPreferences preferences;
     private String currentKey;
     private TextView cityNameField;
     private TextView temperatureField;
@@ -51,26 +54,28 @@ public class MainActivity extends AppCompatActivity implements FragmentEventList
         initFab();
         initViewModel();
         initViews();
+        preferences = getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
         //Подписаться на LiveData - получить город из базы
         viewModel.getCityData().observe(this, data -> {
             if (data != null) {
                 //Установить в поле название города
-                changeProgress();
                 cityNameField.setText(data.getCityName());
                 weatherTextField.setText(data.getWeatherText());
                 temperatureField.setText(String.valueOf(data.getTemperatureValue()));
                 Log.d(LOG_TAG, "Got city - setText(): " + data.getCityName());
+                hideProgress();
             }
         });
 
         //Подписаться на LiveData - получить погоду
         viewModel.getWeatherData().observe(this, data -> {
             Log.d(LOG_TAG, "MainActivity - gotWeather + " + data.getTemperatureValue());
-            changeProgress();
             cityNameField.setText(data.getCityName());
             weatherTextField.setText(data.getWeatherText());
             temperatureField.setText(String.valueOf(data.getTemperatureValue()));
+            viewModel.addToDb(data);
+            hideProgress();
         });
     }
 
@@ -86,8 +91,7 @@ public class MainActivity extends AppCompatActivity implements FragmentEventList
     public void showWeatherFragment(City city) {
         Log.d(LOG_TAG, "Got locationKey: " + city.getLocationKey() + " - loadWeather()");
         currentKey = city.getLocationKey();
-//        viewModel.getWeatherFromDb(city.getLocationKey());
-        viewModel.loadWeather(city.getLocationKey(), API_KEY, LANGUAGE);
+        viewModel.loadWeather(city, API_KEY, LANGUAGE);
         changeProgress();
         removeSearchFragment();
     }
@@ -100,13 +104,15 @@ public class MainActivity extends AppCompatActivity implements FragmentEventList
         ft.commit();
     }
 
-    private void removeSearchFragment() {
+    private boolean removeSearchFragment() {
         if (fragmentManager.findFragmentByTag(SEARCH_FRAGMENT) != null) {
             FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
             ft.remove(fragmentManager.findFragmentByTag(SEARCH_FRAGMENT));
             ft.commit();
+            return true;
         }
+        return false;
     }
 
     private void initViewModel() {
@@ -125,6 +131,30 @@ public class MainActivity extends AppCompatActivity implements FragmentEventList
             progressBar.setVisibility(View.GONE);
         } else {
             progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideProgress() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        preferences.edit().putString(KEY_EXTRA, currentKey).apply();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (preferences.contains(KEY_EXTRA)) {
+            currentKey = preferences.getString(KEY_EXTRA, null);
+        }
+        if (currentKey != null) {
+            viewModel.getWeatherFromDb(currentKey);
+            changeProgress();
         }
     }
 
@@ -147,7 +177,9 @@ public class MainActivity extends AppCompatActivity implements FragmentEventList
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (!removeSearchFragment()) {
+            super.onBackPressed();
+        }
     }
 
     @Override

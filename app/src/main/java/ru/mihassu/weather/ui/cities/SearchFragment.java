@@ -59,7 +59,7 @@ public class SearchFragment extends Fragment {
                 Snackbar.make(cityField, R.string.not_found, Snackbar.LENGTH_LONG).show();
             }
             citiesAdapter.setCitiesList(data);
-            progressBar.setVisibility(View.GONE);
+            changeProgress();
         });
     }
 
@@ -71,6 +71,7 @@ public class SearchFragment extends Fragment {
         initRecyclerView(view);
         //получить города из базы
         viewModel.loadCitiesFromDb();
+        changeProgress();
         return view;
     }
 
@@ -82,7 +83,7 @@ public class SearchFragment extends Fragment {
         //Найти город (в сети)
         buttonFind.setOnClickListener(v -> {
                     viewModel.search(API_KEY, cityField.getText().toString(), LANGUAGE);
-                    progressBar.setVisibility(View.VISIBLE);
+                    changeProgress();
                 }
         );
     }
@@ -104,8 +105,15 @@ public class SearchFragment extends Fragment {
     }
 
     private void showWeather(City city) {
-        //Добавить в базу
-        viewModel.addToDb(city);
+
         activity.showWeatherFragment(city);
+    }
+
+    private void changeProgress() {
+        if (progressBar.getVisibility() == View.VISIBLE) {
+            progressBar.setVisibility(View.GONE);
+        } else {
+            progressBar.setVisibility(View.VISIBLE);
+        }
     }
 }

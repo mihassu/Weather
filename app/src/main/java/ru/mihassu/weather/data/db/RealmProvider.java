@@ -15,7 +15,7 @@ public class RealmProvider implements DbProvider<CityRealm, List<City>> {
     public void insert(CityRealm data) {
         try (Realm realm = Realm.getDefaultInstance()) {
             realm.executeTransaction(trans ->
-                    realm.insertOrUpdate(data)
+                    trans.insertOrUpdate(data)
             );
         } catch (Exception e) {
             e.printStackTrace();
@@ -26,10 +26,11 @@ public class RealmProvider implements DbProvider<CityRealm, List<City>> {
     public void update(CityRealm data) {
         try (Realm realm = Realm.getDefaultInstance()) {
             realm.executeTransaction(trans -> {
-                realm.copyToRealmOrUpdate(data);
+                trans.copyToRealmOrUpdate(data);
             });
         }
     }
+
 
     @Override
     public void delete(CityRealm data) {
@@ -41,7 +42,7 @@ public class RealmProvider implements DbProvider<CityRealm, List<City>> {
 
         try (Realm realm = Realm.getDefaultInstance()) {
             final RealmResults<CityRealm> results =
-                    realm.where(CityRealm.class).findAll();
+                    realm.where(CityRealm.class).findAllAsync();
 
             List<CityRealm> cities = realm.copyFromRealm(results);
             return cities.stream()
